@@ -1,7 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "malla-before-the-silence",
-	"account_id": "db4a8e77371578dc70b161eae21bf6e4",
 	"pages_build_output_dir": "./build",
 	"compatibility_date": "2026-07-27",
 	"send_metrics": false
