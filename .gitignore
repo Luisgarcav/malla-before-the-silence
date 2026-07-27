@@ -1,0 +1,4 @@
+result
+web/static/game.wasm
+node_modules
+.claude/settings.local.json

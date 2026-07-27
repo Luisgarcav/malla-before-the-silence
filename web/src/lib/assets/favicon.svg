@@ -1,0 +1,15 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 128 128"
+	role="img"
+	aria-labelledby="favicon-title"
+>
+	<title id="favicon-title">MALLA signal mark</title>
+	<rect width="128" height="128" rx="18" fill="#03070a" />
+	<path d="M19 99 34 23h15L34 99Z" fill="#65f2fc" />
+	<path d="M48 99 60 40h15L63 99Z" fill="#65f2fc" opacity=".78" />
+	<path d="M76 99 84 61h15l-8 38Z" fill="#ffb547" />
+	<path d="M18 108h82" fill="none" stroke="#508096" stroke-width="3" />
+	<path d="M18 108h31" fill="none" stroke="#65f2fc" stroke-width="3" />
+	<path d="M107 30v70" fill="none" stroke="#1c3c49" stroke-width="3" />
+</svg>

@@ -1,0 +1,52 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 14 560 124"
+	role="img"
+	aria-labelledby="malla-logo-title malla-logo-description"
+>
+	<title id="malla-logo-title">MALLA: Before the Silence</title>
+	<desc id="malla-logo-description">
+		Three fading signal bars beside the geometric MALLA wordmark.
+	</desc>
+
+	<g aria-hidden="true">
+		<path d="M18 118 37 23h17l-19 95Z" fill="#65f2fc" />
+		<path d="M52 118 67 45h17l-15 73Z" fill="#65f2fc" opacity=".78" />
+		<path d="M83 118 93 71h17l-10 47Z" fill="#ffb547" />
+		<path d="M17 127h94" fill="none" stroke="#508096" stroke-width="2" />
+		<path d="M17 127h35" fill="none" stroke="#65f2fc" stroke-width="2" />
+		<rect x="116" y="23" width="2" height="105" fill="#1c3c49" />
+	</g>
+
+	<g
+		aria-hidden="true"
+		fill="none"
+		stroke="#ecfbff"
+		stroke-linecap="square"
+		stroke-linejoin="bevel"
+		stroke-width="11"
+	>
+		<path d="M155 92V29l31 35 31-35v63" />
+		<path d="m242 92 28-63 28 63M252 70h36" />
+		<path d="M326 29v63h48" />
+		<path d="M402 29v63h48" />
+		<path d="m476 92 28-63 28 63M486 70h36" />
+	</g>
+
+	<g aria-hidden="true">
+		<path d="M155 106h378" stroke="#1c3c49" />
+		<path d="M155 106h76" stroke="#65f2fc" stroke-width="2" />
+		<rect x="539" y="102" width="8" height="8" fill="#ffb547" />
+		<text
+			x="155"
+			y="132"
+			fill="#89aeb9"
+			font-family="'IBM Plex Mono', 'Cascadia Mono', monospace"
+			font-size="15"
+			font-weight="500"
+			letter-spacing="4"
+		>
+			BEFORE THE SILENCE
+		</text>
+	</g>
+</svg>
