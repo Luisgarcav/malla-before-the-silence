@@ -1225,6 +1225,14 @@ BEACON_CHANNEL_MAX :: 32
 BEACON_OFFSET_MIN :: -250
 BEACON_OFFSET_MAX :: 250
 BEACON_MIN_LLR_MARGIN :: 100
+BEACON_MIN_MAJORITY_FAILURES :: 3
+BEACON_GENERATION_ATTEMPT_LIMIT :: 64
+
+BEACON_SIGNAL_BASES :: [BEACON_COPY_COUNT]int{-51, -59, -66, -76, -83, -88, -93, -97, -101}
+BEACON_MAJORITY_POSITIONS :: [3]int{2, 3, 10}
+BEACON_MAJORITY_MASKS :: [3]u8{0x40, 0x20, 0x08}
+BEACON_WEAK_TARGETS :: [BEACON_COPY_COUNT - 3]int{5, 7, 9, 11, 13, 15}
+BEACON_FALLBACK_POSITIONS :: [BEACON_FRAME_SIZE - 3]int{0, 1, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15}
 
 Beacon_Copy :: struct {
 	data:       [BEACON_FRAME_SIZE]u8,
@@ -1369,10 +1377,85 @@ beacon_weighted_reconstruct :: proc(instance: ^Beacon_Instance) -> [BEACON_FRAME
 	return beacon_soft_reconstruct(instance)
 }
 
+beacon_update_reconstruction_stats :: proc(instance: ^Beacon_Instance) {
+	instance.majority_failure_count = 0
+	simple := beacon_simple_reconstruct(instance)
+	for position in 0..<BEACON_FRAME_SIZE {
+		if simple[position] != instance.frame[position] {
+			instance.majority_failure_count += 1
+		}
+	}
+
+	instance.min_llr_margin = max(int)
+	for position in 0..<BEACON_FRAME_SIZE {
+		for bit in 0..<8 {
+			margin := abs(beacon_bit_llr(instance, position, bit))
+			if margin < instance.min_llr_margin {
+				instance.min_llr_margin = margin
+			}
+		}
+	}
+}
+
+beacon_candidate_valid :: proc(instance: ^Beacon_Instance) -> bool {
+	beacon_update_reconstruction_stats(instance)
+	soft := beacon_soft_reconstruct(instance)
+	return instance.majority_failure_count >= BEACON_MIN_MAJORITY_FAILURES &&
+	       soft == instance.frame &&
+	       beacon_crc16_valid(&soft) &&
+	       instance.min_llr_margin >= BEACON_MIN_LLR_MARGIN
+}
+
+// Patrón acotado de último recurso. Los errores fuertes usan el bit 7 y los
+// débiles el bit 0, de modo que nunca se apilan sobre la misma decisión. Las
+// seis copias débiles todavía comparten tres errores para derrotar la mayoría.
+beacon_apply_deterministic_fallback :: proc(instance: ^Beacon_Instance) {
+	signal_bases := BEACON_SIGNAL_BASES
+	majority_positions := BEACON_MAJORITY_POSITIONS
+	majority_masks := BEACON_MAJORITY_MASKS
+	weak_targets := BEACON_WEAK_TARGETS
+	fallback_positions := BEACON_FALLBACK_POSITIONS
+
+	instance.copies = [BEACON_COPY_COUNT]Beacon_Copy{}
+	for copy_index in 0..<BEACON_COPY_COUNT {
+		instance.copies[copy_index].data = instance.frame
+		instance.copies[copy_index].signal_dbm = signal_bases[copy_index]
+		instance.copies[copy_index].bit_error_ppm = beacon_bit_error_ppm(instance.copies[copy_index].signal_dbm)
+		instance.copies[copy_index].llr_weight = beacon_signal_weight(instance.copies[copy_index].signal_dbm)
+	}
+
+	for copy_index in 3..<BEACON_COPY_COUNT {
+		for position, index in majority_positions {
+			beacon_corrupt_at(&instance.copies[copy_index], position, majority_masks[index])
+		}
+	}
+
+	beacon_corrupt_at(&instance.copies[1], 0, 0x80)
+	beacon_corrupt_at(&instance.copies[2], 1, 0x80)
+	beacon_corrupt_at(&instance.copies[2], 4, 0x80)
+
+	for weak_index in 0..<len(weak_targets) {
+		copy_index := weak_index + 3
+		extra_count := weak_targets[weak_index] - len(majority_positions)
+		for position_index in 0..<extra_count {
+			beacon_corrupt_at(
+				&instance.copies[copy_index],
+				fallback_positions[position_index],
+				0x01,
+			)
+		}
+	}
+	beacon_update_reconstruction_stats(instance)
+}
+
 generate_beacon_instance :: proc(seed: u64) -> Beacon_Instance {
 	instance: Beacon_Instance
 	instance.seed = seed
 	state := seed
+	signal_bases := BEACON_SIGNAL_BASES
+	majority_positions := BEACON_MAJORITY_POSITIONS
+	majority_masks := BEACON_MAJORITY_MASKS
+	weak_targets := BEACON_WEAK_TARGETS
 	instance.channel = BEACON_CHANNEL_MIN + rng_below(&state, BEACON_CHANNEL_MAX)
 	instance.offset_ms = -180 + rng_below(&state, 361)
 
@@ -1398,18 +1481,12 @@ generate_beacon_instance :: proc(seed: u64) -> Beacon_Instance {
 	instance.frame[14] = u8(instance.crc16 >> 8)
 	instance.frame[15] = u8(instance.crc16)
 
-	signal_bases := [BEACON_COPY_COUNT]int{-51, -59, -66, -76, -83, -88, -93, -97, -101}
-	majority_positions := [3]int{2, 3, 10}
-	majority_masks := [3]u8{0x40, 0x20, 0x08}
-
 	// Las tres primeras copias conservan la mayor parte de la trama. Las seis
 	// débiles comparten tres errores para derrotar la mayoría simple en todos
 	// los campos que exige el enganche. Si los errores aleatorios adicionales
 	// reducen demasiado el margen, se vuelve a muestrear sólo la recepción.
-	for {
+	for _ in 0..<BEACON_GENERATION_ATTEMPT_LIMIT {
 		instance.copies = [BEACON_COPY_COUNT]Beacon_Copy{}
-		instance.min_llr_margin = 0
-		instance.majority_failure_count = 0
 
 		for copy_index in 0..<BEACON_COPY_COUNT {
 			instance.copies[copy_index].data = instance.frame
@@ -1444,7 +1521,6 @@ generate_beacon_instance :: proc(seed: u64) -> Beacon_Instance {
 			}
 		}
 
-		weak_targets := [BEACON_COPY_COUNT - 3]int{5, 7, 9, 11, 13, 15}
 		for weak_index in 0..<len(weak_targets) {
 			copy_index := weak_index + 3
 			changed: [BEACON_FRAME_SIZE]bool
@@ -1462,29 +1538,13 @@ generate_beacon_instance :: proc(seed: u64) -> Beacon_Instance {
 			}
 		}
 
-		simple := beacon_simple_reconstruct(&instance)
-		for position in 0..<BEACON_FRAME_SIZE {
-			if simple[position] != instance.frame[position] {
-				instance.majority_failure_count += 1
-			}
+		if beacon_candidate_valid(&instance) {
+			return instance
 		}
-		soft := beacon_soft_reconstruct(&instance)
-		instance.min_llr_margin = max(int)
-		for position in 0..<BEACON_FRAME_SIZE {
-			for bit in 0..<8 {
-				margin := abs(beacon_bit_llr(&instance, position, bit))
-				if margin < instance.min_llr_margin {
-					instance.min_llr_margin = margin
-				}
-			}
-		}
-		if soft != instance.frame ||
-		   !beacon_crc16_valid(&soft) ||
-		   instance.min_llr_margin < BEACON_MIN_LLR_MARGIN {
-			continue
-		}
-		return instance
 	}
+
+	beacon_apply_deterministic_fallback(&instance)
+	return instance
 }
 
 validate_beacon_tune :: proc(

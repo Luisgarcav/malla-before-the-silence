@@ -922,6 +922,25 @@ beacon_instances_defeat_simple_majority_and_recover_by_weight :: proc(t: ^testin
 }
 
 @(test)
+beacon_fallback_is_bounded_deterministic_and_valid :: proc(t: ^testing.T) {
+	expected_errors := [BEACON_COPY_COUNT]int{0, 1, 2, 5, 7, 9, 11, 13, 15}
+	for seed in 1..=256 {
+		first := generate_beacon_instance(u64(seed))
+		second := first
+		beacon_apply_deterministic_fallback(&first)
+		beacon_apply_deterministic_fallback(&second)
+
+		testing.expect(t, first == second)
+		testing.expect(t, beacon_candidate_valid(&first))
+		testing.expect(t, beacon_soft_reconstruct(&first) == first.frame)
+		testing.expect(t, first.min_llr_margin >= BEACON_MIN_LLR_MARGIN)
+		for copy_index in 0..<BEACON_COPY_COUNT {
+			testing.expect_value(t, first.copies[copy_index].error_count, expected_errors[copy_index])
+		}
+	}
+}
+
+@(test)
 beacon_crc16_matches_ccitt_false_check_value :: proc(t: ^testing.T) {
 	check := [9]u8{'1', '2', '3', '4', '5', '6', '7', '8', '9'}
 	testing.expect_value(t, beacon_crc16(check[:]), u16(0x29B1))
