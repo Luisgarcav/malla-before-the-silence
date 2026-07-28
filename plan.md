@@ -15,7 +15,7 @@ Duración dentro de la historia: 4 a 5 horas
 
 ### Pitch
 
-`MALLA: BEFORE THE SILENCE` es un thriller de terror político cyberpunk jugado
+`MALLA: BEFORE THE SILENCE` es un thriller político cyberpunk jugado
 desde una web que representa la terminal de una laptop de mantenimiento. La
 interfaz viaja con Ellie: cada conexión exige alcanzar físicamente un nodo
 distinto. Mientras una
@@ -35,8 +35,8 @@ operativa mínima y verifica si es compatible con el sistema local.
 
 - Una historia sencilla: dos personas intentan volver a verse.
 - Un conflicto grande visto desde una escala íntima.
-- Terror producido por el Estado, la incertidumbre y la infraestructura
-  cotidiana convertida en un arma, no por monstruos ni fenómenos mentales.
+- Tensión producida por el Estado, la incertidumbre y la infraestructura
+  cotidiana convertida en un instrumento de control.
 - Hacking creíble, limitado por permisos, topología, tiempo y rastros.
 - Incidentes técnicos basados en sistemas reales, con evidencia suficiente y
   una razón narrativa.
@@ -48,8 +48,9 @@ operativa mínima y verifica si es compatible con el sistema local.
    separar a la pareja.
 2. **La red es el escenario.** Transporte, energía, radio, fábricas y vigilancia
    forman un mismo organismo urbano.
-3. **El horror es institucional.** Órdenes impersonales, listas, cierres,
-   correlación de datos y silencios en la comunicación sustituyen al monstruo.
+3. **El control es institucional.** Órdenes impersonales, listas, cierres,
+   correlación de datos y silencios convierten la infraestructura cotidiana en
+   un mecanismo de coerción.
 4. **Los algoritmos son acciones.** No habrá acertijos arbitrarios disfrazados
    de programación.
 5. **Poco alcance, alta densidad.** Una noche, una ciudad sin nombre, dos
@@ -1324,7 +1325,7 @@ a trasladar literalmente personas o hechos al juego.
   documentación primaria y contexto archivístico del proyecto.
 
 **Inferencia de diseño:** una red creada para coordinar producción y servicios
-es una base histórica más sólida que una “super-IA”. En la ficción, el horror
+es una base histórica más sólida que una “super-IA”. En la ficción, la amenaza
 surge cuando cambian las llaves, los operadores y los objetivos.
 
 ### Golpe de Estado y control de comunicaciones

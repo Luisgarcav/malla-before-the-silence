@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <strong>A political cyber-horror game about infrastructure, uncertainty, and two people trying to find each other before a city goes silent.</strong>
+  <strong>A political cyberpunk thriller about infrastructure, uncertainty, and two people trying to find each other before a city goes silent.</strong>
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@ her partner, at an old analog repeater before communications disappear.
 
 There is no combat, supernatural threat, or omnipotent hacking. Ellie has
 limited credentials, incomplete topology, and physical access only to the node
-in front of her. The horror comes from ordinary systems—transport, radio,
+in front of her. The tension comes from ordinary systems—transport, radio,
 identity, and logistics—being repurposed as instruments of control.
 
 ## What the player does
@@ -209,8 +209,8 @@ evidence stay in the browser, and a refresh starts a new deterministic session.
   surveillance form one urban organism.
 - **Algorithms are actions.** Each technical task has an operational and
   narrative reason to exist.
-- **The horror is institutional.** Lists, curfews, correlation, and silence
-  replace monsters.
+- **Control is institutional.** Lists, curfews, correlation, and silence turn
+  ordinary infrastructure into a system of coercion.
 - **Accessibility is part of the interface.** The UI supports keyboard use,
   responsive layouts, reduced motion, text scaling, explicit status text, and
   progressive hints.

@@ -100,7 +100,7 @@
 	<title>MALLA: Before the Silence</title>
 	<meta
 		name="description"
-		content="A political cyber-horror story about crossing an occupied city before its civic network goes silent."
+		content="A political cyberpunk thriller about crossing an occupied city before its civic network goes silent."
 	/>
 	<meta name="theme-color" content="#03070a" />
 </svelte:head>
